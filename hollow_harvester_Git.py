@@ -24,8 +24,8 @@ g = G(
     print_lines=False,
     )
 g.setup()
-
-def spiral(radius, over, x_center, y_center, direction = 'CW'):
+z_start = 1.6
+def spiral(radius, over, x_center, y_center,  direction = 'CW'):
     g.abs_move(x=x_center, y=(y_center-over*0.5))
     repeats = 2*(radius/over)
     count = 0
@@ -140,7 +140,10 @@ def arc_meander(x_center, y_center, R_min, R_max, over, start_angle, arc_length,
         g.abs_arc(direction = direction2, radius = R_working, x=x1, y=y1)
         count = count + 1
     
-    
+def print_insulating_meanders():    
+   arc_meander(x_center, y_center, R_min, R_max, over, start_angle, arc_length, start_direction = 'CW', start = 'R_min')
+   
+   
    
 def print_tailed_ring(over, xr_in, xl_in, y_start, y_end_in, r_in, r_out, xr_out, xl_out, y_end_out, layers, layer_height, speed, pressure, nozzle = 'A'): 
     
@@ -238,42 +241,45 @@ def partial_tailed_ring(x_center, y_center, x_offset, inner_radius, over, center
         g.move(**{nozzle:layer_height})                                   
 
 def print_top_inner_electrode():
-    g.abs_move(z=0.15)
-    inner_electrode(x_center = 0, y_center=0, x_offset=0, inner_radius = 10, outer_radius = 20, over=0.6, center_to_top = 20, speed = 8, layers = 5, layer_height = 0.3, pressure = 40)  
+    g.abs_move(z=z_start)
+    inner_electrode(x_center = 0, y_center=0, x_offset=0, inner_radius = 7.5, outer_radius = 20, over=0.7, center_to_top = 20, speed = 8, layers = 5, layer_height = 0.3, pressure = 40)  
                                                                                                       
 def print_top_outer_electrode():
-    g.abs_move(z=0.15)
-    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0.9, inner_radius = 13.5, over = 0.6, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_up', side = 'left', angle = 25, nozzle = 'z')  
-    g.abs_move(z=0.15)                            
-    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0.9, inner_radius = 13.5, over = 0.6, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_up', side = 'right', angle = 25, nozzle = 'z')
+    g.abs_move(z=z_start)
+    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0.9, inner_radius = 12.5, over = 0.7, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_up', side = 'left', angle = 25, nozzle = 'z')  
+    g.abs_move(z=z_start)                            
+    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0.9, inner_radius = 12.5, over = 0.7, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_up', side = 'right', angle = 25, nozzle = 'z')
 
 def print_bottom_inner_electrode():
-    g.abs_move(z=0.15)
-    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0, inner_radius = 12.5, over = 0.6, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_down', side = 'left', angle = 25, nozzle = 'z')
-    g.abs_move(z=0.15)
-    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0, inner_radius = 12.5, over = 0.6, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_down', side = 'right', angle = 25, nozzle = 'z')
+    g.abs_move(z=z_start)
+    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0, inner_radius = 10, over = 0.7, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_down', side = 'left', angle = 25, nozzle = 'z')
+    g.abs_move(z=z_start)
+    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0, inner_radius = 10, over = 0.7, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_down', side = 'right', angle = 25, nozzle = 'z')
 
 
 def print_bottom_outer_electrode():
-    g.abs_move(z=0.15)
-    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0.9, inner_radius = 15.5, over = 0.6, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_down', side = 'left', angle = 25, nozzle = 'z')
-    g.abs_move(z=0.15)
-    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0.9, inner_radius = 15.5, over = 0.6, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_down', side = 'right', angle = 25, nozzle = 'z')
+    g.abs_move(z=z_start)
+    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0.9, inner_radius = 15, over = 0.7, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_down', side = 'left', angle = 25, nozzle = 'z')
+    g.abs_move(z=z_start)
+    partial_tailed_ring(x_center=0, y_center=0, x_offset= 0.9, inner_radius = 15, over = 0.7, center_to_top = 20, layers = 5, layer_height = 0.3, speed = 8, pressure = 40, orientation = 'tail_down', side = 'right', angle = 25, nozzle = 'z')
 
 
 
 #hollow_spiral(inner_radius = 5, outer_radius = 20, over = 1 , x_center = 0, y_center = 0, direction = 'CW')
 
 
-
-arc_meander(x_center=0, y_center=0, R_min = 11, R_max = 40, over = 0.8, start_angle = 88.5, arc_length = 22, start_direction = 'CW', start = 'R_min')
-
-
-#stacked_hollow_spirals(min_radius = 2, max_radius=10, outer_radius = 25, r_step=1, layer_height = 1, over=1, x_center=0, y_center=0, direction='CW', nozzle = 'z')
-#print_top_inner_electrode()
-#print_top_outer_electrode()
-#print_bottom_inner_electrode()
-#print_bottom_outer_electrode()
+#
+#arc_meander(x_center=0, y_center=0, R_min = 8.9, R_max = 10.85, over = 0.65, start_angle = 80, arc_length = 12, start_direction = 'CW', start = 'R_min')
+#arc_meander(x_center=0, y_center=0, R_min = 10.85, R_max = 12.5, over = 0.65, start_angle = 83, arc_length = 15, start_direction = 'CW', start = 'R_min')
+g.abs_move(z=0.2)
+spiral(radius=25, over=1, x_center=0, y_center=0, direction = 'CW')
+g.abs_move(z=0.4)
+stacked_hollow_spirals(min_radius = 3, max_radius=6, outer_radius = 25, r_step=0.5, layer_height = 0.2, over=1, x_center=0, y_center=0, direction='CW', nozzle = 'z')
+g.abs_move(z=1.6)
+print_top_inner_electrode()
+print_top_outer_electrode()
+print_bottom_inner_electrode()
+print_bottom_outer_electrode()
 
 
 
