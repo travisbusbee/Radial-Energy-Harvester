@@ -28,7 +28,7 @@ g = G(
     print_lines=False,
     )
     
-zero=(77.276200, 93.9792, 60, 93.852950)
+zero=(79.216500, 82.533100, 60, 93.852950)
 pressure_box = 4
 g.setup()
 #z_start = 1.6
@@ -202,7 +202,60 @@ def inner_electrode(x_center, y_center, x_offset, inner_radius, outer_radius, ov
     print_tailed_ring(over=over, xr_in=x_right, xl_in=x_left, y_start=y_start, y_end_in=y_end, r_in=temp_inner, r_out=temp_inner_outer, xr_out=x_right_outer, 
                         xl_out=x_left_outer, y_end_out=y_end_outer, layers = layers, layer_height = layer_height, speed = speed, pressure = pressure, nozzle = nozzle)
    
+def single_straight_stack(x, layer_height, z, layers, speed, pressure, nozzle, valve):
+   
+    count = 0
+    for i in range(layers):
+        count = count +1
+        g.set_valve(num = valve, value = 1)
+        g.move(x=x)
+        g.move(**{nozzle:layer_height})
+        g.move(x=-x)
+        if count != layers:
+            g.move(**{nozzle:layer_height})
+        else:
+            g.set_valve(num = valve, value = 0)
+            g.clip(axis=nozzle, direction='-x', height=4)
+    
+def double_straight_stack(x, over, layer_height, z, layers, speed, pressure, nozzle, valve):
+   
+    count = 0
+    for i in range(layers):
+        count = count +1
+        g.set_valve(num = valve, value = 1)
+        g.move(x=x)
+        g.move(y=over)
+        g.move(x=-x)
+        g.move(y=-over)
+        if count != layers:
+            g.move(**{nozzle:layer_height})
+        else:
+            g.set_valve(num = valve, value = 0)
+            g.dwell(0.2)
+            g.clip(axis=nozzle, direction='-x', height=2)
+        
+def print_straight_electrode(x, z, tail, layer_height, layers, speed, pressure, nozzle, valve):
+    g.feed(15)
+    g.set_pressure(com_port=pressure_box, value=pressure)    
+    g.abs_move(**{nozzle:z})
+    g.feed(speed)
+    g.set_valve(num = valve, value = 1)
+    g.dwell(0.2)
+    g.move(x=tail)
+    single_straight_stack(x, layer_height, z, layers, speed, pressure, nozzle, valve)  
+    g.set_valve(num = valve, value = 0)
 
+def print_double_electrode(x, over, z, tail, layer_height, layers, speed, pressure, nozzle, valve):
+    g.feed(15)
+    g.set_pressure(com_port=pressure_box, value=pressure)    
+    g.abs_move(**{nozzle:z})
+    g.feed(speed)
+    g.set_valve(num = valve, value = 1)
+    g.dwell(0.8)
+    #g.move(x=tail)
+    double_straight_stack(x, over, layer_height, z, layers, speed, pressure, nozzle, valve)  
+    g.set_valve(num = valve, value = 0)      
+                  
 def partial_tailed_ring(x_center, y_center, z_start, x_offset, inner_radius, over, center_to_top, layers, layer_height, speed, pressure, orientation = 'tail_up', side = 'left', angle = 25, nozzle = 'A'):
     temp_inner = inner_radius + 0.5*over  
     temp_outer = inner_radius + 1.5*over  
@@ -385,37 +438,54 @@ def print_bottom_outer_electrode(z_start, nozzle):
 
 
 
-#recall_alignment(nozzle = 'all')
+recall_alignment(nozzle = 'all')
 g.feed(30)
-g.align_zero_nozzle(nozzle='A', floor=-49.25, deltafast=0.85, deltaslow=0.1, start=-15)
+#g.align_zero_nozzle(nozzle='A', floor=-49.25, deltafast=0.85, deltaslow=0.1, start=-15)
 #g.align_zero_nozzle(nozzle='B', floor=-49.25, deltafast=0.85, deltaslow=0.1, start=-15)
 #g.align_zero_nozzle(nozzle='D', floor=-49.25, deltafast=0.85, deltaslow=0.1, start=-15)
 g.save_alignment(nozzle = 'all')
 g.feed(30)
-g.abs_move(A=-5, B=-5, C=-5, D=-5)
-g.abs_move(x=350.469 + 38, y=129.9315 - 25)#197.96
+g.abs_move(A=-2, B=-2, C=-2, D=-2)
+g.abs_move(x=352, y=70.24)#197.96
 g.write('G1 X$Ax_dif  Y$Ay_dif')
 g.set_home(x=0, y=0)
 pressure_purge()
 g.toggle_pressure(pressure_box)
-calculate_relative_z(reference_nozzle = 'A')
+calculate_relative_z(reference_nozzle = 'B')
 
 g.abs_move(A=-5, B=-5, C=-5, D=-5)
 set_home_in_aerotech()
 
+nozzle_change_vars('ab')
+g.set_home(x=0, y=0)
+
+#print_straight_electrode(x = 20, z = 0.15, tail = 10, layer_height = 0.15, layers = 5, speed = 4, pressure = 45, nozzle = 'B', valve = 1)
+g.feed(15)
+
+g.abs_move(x=20, y=-20)
+g.set_pressure(pressure_box, 50)
+g.abs_move(B=0.2)
+g.feed(6)
+g.set_valve(num = 1, value = 1)
+g.meander(x=20, y=-20, spacing=0.34, orientation = 'y', tail = False)
+g.set_valve(num = 1, value = 0)
+#print_double_electrode(x = 20, over=-0.34, z = 0.22, tail = 10, layer_height = 0.25, layers = 8, speed = 6, pressure = 40, nozzle = 'B', valve = 1)
+
+#g.move(y=-2.2)
+#print_double_electrode(x = 20, over=-0.34, z = 0.22, tail = 10, layer_height = 0.25, layers = 8, speed = 6, pressure = 40, nozzle = 'B', valve = 1)
 
 #hollow_spiral(inner_radius = 5, outer_radius = 20, over = 1 , x_center = 0, y_center = 0, direction = 'CW')
 
-
+g.toggle_pressure(pressure_box)
 #
 #arc_meander(x_center=0, y_center=0, R_min = 8.9, R_max = 10.85, over = 0.65, start_angle = 80, arc_length = 12, start_direction = 'CW', start = 'R_min')
 #arc_meander(x_center=0, y_center=0, R_min = 10.85, R_max = 12.5, over = 0.65, start_angle = 83, arc_length = 15, start_direction = 'CW', start = 'R_min')
 #g.abs_move(z=0.2)
 
 #g.abs_move(z=0.4)
-g.set_pressure(pressure_box, 19)
-g.feed(12)
-pressure_purge()
+#g.set_pressure(pressure_box, 19)
+#g.feed(12)
+#pressure_purge()
 #g.abs_move(A=0.2)
 #spiral(radius=10, over=0.5, x_center=0, y_center=0, direction = 'CW')
 #g.abs_move(A=0.5)
@@ -426,14 +496,14 @@ pressure_purge()
 
 
 
-print_top_inner_electrode(z_start=0.2, nozzle = 'A')
-print_top_outer_electrode(z_start=0.2, nozzle = 'A')
-print_bottom_inner_electrode(z_start=0.2, nozzle = 'A')
-print_bottom_outer_electrode(z_start=0.2, nozzle = 'A')
-
-
-
-g.move(A=40)
+#print_top_inner_electrode(z_start=0.2, nozzle = 'A')
+#print_top_outer_electrode(z_start=0.2, nozzle = 'A')
+#print_bottom_inner_electrode(z_start=0.2, nozzle = 'A')
+#print_bottom_outer_electrode(z_start=0.2, nozzle = 'A')
+#
+#
+#
+#g.move(A=40)
 
 
 
